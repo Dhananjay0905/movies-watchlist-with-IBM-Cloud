@@ -1,5 +1,5 @@
 # --- STAGE 1: Build the Frontend ---
-FROM node:20-alpine as client_build
+FROM node:18-alpine as client_build
 WORKDIR /app/client
 
 RUN apk update && apk upgrade --no-cache
@@ -13,10 +13,8 @@ COPY client/ ./
 RUN npm run build
 
 # --- STAGE 2: Setup the Backend & Final Image ---
-FROM node:20-alpine
+FROM node:18-alpine
 WORKDIR /app/server
-
-ENV NODE_ENV=production
 
 # Copy backend package files and install production dependencies
 COPY server/package*.json ./
@@ -27,10 +25,6 @@ COPY server/ ./
 
 # Copy the built frontend from Stage 1 into the correct path for the server
 COPY --from=client_build /app/client/dist ../client/dist
-
-# Use a non-root user for security
-RUN chown -R node:node /app
-USER node
 
 # Expose the port the app runs on
 EXPOSE 3000
