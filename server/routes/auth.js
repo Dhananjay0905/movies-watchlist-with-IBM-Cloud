@@ -39,8 +39,30 @@ router.get('/logout', (req, res) => {
 
 // Get current authenticated user info
 router.get('/user', (req, res) => {
-    console.log('[Auth/user] Session ID:', req.sessionID, '| isAuthenticated:', req.isAuthenticated());
     res.json({ isAuthenticated: req.isAuthenticated(), user: req.user || null });
+});
+
+// Debug endpoint — exposes full session & auth state in the browser response
+// Remove this once auth is working correctly
+router.get('/debug', (req, res) => {
+    res.json({
+        isAuthenticated: req.isAuthenticated(),
+        user: req.user || null,
+        sessionID: req.sessionID,
+        session: req.session,
+        cookies: req.headers.cookie || 'no cookies received',
+        nodeEnv: process.env.NODE_ENV,
+        trustProxy: req.app.get('trust proxy'),
+        protocol: req.protocol,
+        secure: req.secure,
+        headers: {
+            host: req.headers.host,
+            origin: req.headers.origin,
+            referer: req.headers.referer,
+            'x-forwarded-proto': req.headers['x-forwarded-proto'],
+            'x-forwarded-for': req.headers['x-forwarded-for'],
+        },
+    });
 });
 
 module.exports = router;
