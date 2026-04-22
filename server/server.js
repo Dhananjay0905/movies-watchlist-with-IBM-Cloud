@@ -44,7 +44,9 @@ app.use(session({
     saveUninitialized: false,
     cookie: { 
         secure: process.env.NODE_ENV === 'production', // true in prod for HTTPS
-        sameSite: 'lax',
+        // 'none' is required for cross-site OAuth redirects (IBM App ID)
+        // Browsers block 'lax' cookies on cross-origin POST/redirects
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
         maxAge: 24 * 60 * 60 * 1000 // 24 hours
     },
 }));

@@ -12,8 +12,23 @@ router.get('/login', passport.authenticate(WebAppStrategy.STRATEGY_NAME, {
 // IBM App ID OAuth callback
 router.get('/ibm/cloud/appid/callback', (req, res, next) => {
     passport.authenticate(WebAppStrategy.STRATEGY_NAME, (err, user) => {
-        if (err || !user) return res.redirect('/auth/login');
-        req.logIn(user, () => res.redirect('/'));
+        if (err) {
+            console.error('[Auth Callback] Passport error:', err);
+            return res.redirect('/auth/login');
+        }
+        if (!user) {
+            console.warn('[Auth Callback] No user returned from App ID');
+            return res.redirect('/auth/login');
+        }
+
+        req.logIn(user, (loginErr) => {
+            if (loginErr) {
+                console.error('[Auth Callback] req.logIn error:', loginErr);
+                return res.redirect('/auth/login');
+            }
+            console.log('[Auth Callback] Login successful for:', user.email || user.id);
+            return res.redirect('/');
+        });
     })(req, res, next);
 });
 
@@ -24,7 +39,8 @@ router.get('/logout', (req, res) => {
 
 // Get current authenticated user info
 router.get('/user', (req, res) => {
-    res.json({ isAuthenticated: !!req.user, user: req.user || null });
+    console.log('[Auth/user] Session ID:', req.sessionID, '| isAuthenticated:', req.isAuthenticated());
+    res.json({ isAuthenticated: req.isAuthenticated(), user: req.user || null });
 });
 
 module.exports = router;
