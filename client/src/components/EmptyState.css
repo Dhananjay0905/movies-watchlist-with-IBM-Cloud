@@ -1,0 +1,54 @@
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 5rem 2rem;
+    gap: 0.75rem;
+    grid-column: 1 / -1; /* stretch across the full grid */
+}
+
+.empty-icon {
+    font-size: 4rem;
+    animation: wiggle 2s infinite;
+}
+
+@keyframes wiggle {
+    0%, 100% { transform: rotate(0); }
+    25% { transform: rotate(-10deg); }
+    75% { transform: rotate(10deg); }
+}
+
+.empty-state h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.empty-state p {
+    color: #888;
+    font-size: 0.95rem;
+}
+
+.empty-sub {
+    font-style: italic;
+    font-size: 0.85rem !important;
+}
+
+.empty-cta {
+    margin-top: 1rem;
+    padding: 0.7rem 1.8rem;
+    background: #e50914;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.empty-cta:hover {
+    opacity: 0.85;
+}

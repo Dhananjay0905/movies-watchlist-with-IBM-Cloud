@@ -26,6 +26,10 @@ COPY server/ ./
 # Copy the built frontend from Stage 1 into the correct path for the server
 COPY --from=client_build /app/client/dist ../client/dist
 
+# Use a non-root user for security
+RUN chown -R node:node /app
+USER node
+
 # Expose the port the app runs on
 EXPOSE 3000
 
