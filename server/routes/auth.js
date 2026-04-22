@@ -26,8 +26,18 @@ router.get('/ibm/cloud/appid/callback', (req, res, next) => {
                 console.error('[Auth Callback] req.logIn error:', loginErr);
                 return res.redirect('/auth/login');
             }
-            console.log('[Auth Callback] Login successful for:', user.email || user.id);
-            return res.redirect('/');
+            
+            // Force an explicit session save before redirecting.
+            // This prevents a common race condition where the redirect
+            // happens before the session store has finished writing the user data.
+            req.session.save((saveErr) => {
+                if (saveErr) {
+                    console.error('[Auth Callback] Session save error:', saveErr);
+                    return res.redirect('/auth/login');
+                }
+                console.log('[Auth Callback] Login successful and session saved for:', user.email || user.id);
+                return res.redirect('/');
+            });
         });
     })(req, res, next);
 });
