@@ -15,6 +15,11 @@ const watchlistRouter = require('./routes/watchlist');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// --- PROXY SETTING (CRITICAL for Code Engine / HTTPS) ---
+// Tell Express to trust the reverse proxy headers (X-Forwarded-Proto)
+// This is required for session cookies to be saved over HTTPS
+app.set('trust proxy', 1);
+
 // --- SECURITY MIDDLEWARE ---
 app.use(helmet({ contentSecurityPolicy: false })); // CSP off so frontend scripts load
 app.use(cors());
@@ -37,7 +42,11 @@ app.use(session({
     secret: process.env.SESSION_SECRET || 'change_this_secret',
     resave: false,
     saveUninitialized: false,
-    cookie: { secure: false }, // set to true if using HTTPS in prod
+    cookie: { 
+        secure: process.env.NODE_ENV === 'production', // true in prod for HTTPS
+        sameSite: 'lax',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    },
 }));
 app.use(passport.initialize());
 app.use(passport.session());
